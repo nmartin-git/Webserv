@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/10/30 17:46:27 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/03 14:48:23 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,14 @@ class	Data
 
 		Data();
 		~Data();
-		void	setAddrinfo(void);
-		void	addSocket(void);
-		int		getFd(int index);
-		void	clean(void);
-		void	exit(int status);
-		void	exitError(void);
+		void			setAddrinfo(void);
+		struct addrinfo	*getAddrinfo(void);
+		void			addSocket(void);
+		void			pollLoop(void);
+		int				getFd(int index);
+		void			clean(void);
+		void			exit(int status);
+		void			exitError(void);
 
 	private:
 
@@ -41,7 +43,3 @@ class	Data
 		int				_fds[MAX_FDS];
 		int				_fdsNbr;
 };
-
-//---socket.cpp---
-
-void	socketHandling(Data *data);

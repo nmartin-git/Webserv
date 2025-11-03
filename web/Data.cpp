@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/10/30 18:31:08 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/03 16:15:21 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,33 +39,37 @@ void	Data::setAddrinfo(void)
 	}
 }
 
-void	Data::addSocket()
+struct addrinfo	*Data::getAddrinfo(void)
+{
+	return (_addrinfo);
+}
+
+void	Data::addSocket(void)
 {
 	// if (_fdsNbr >= MAX_FDS)//handle
 	_fds[_fdsNbr] = socket(_addrinfo->ai_family, _addrinfo->ai_socktype, _addrinfo->ai_protocol);
 	if (_fds[_fdsNbr] == -1)
-	{
-		std::cerr << "A" << std::endl;
 		exitError();
-	}
 	int yes = 1;
 	setsockopt(_fds[_fdsNbr], SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 	if (bind(_fds[_fdsNbr], _addrinfo->ai_addr, _addrinfo->ai_addrlen) == -1)
-	{
-		std::cerr << "B" << std::endl;
 		exitError();
-	}
-	if (connect(_fds[_fdsNbr], _addrinfo->ai_addr, _addrinfo->ai_addrlen) == -1)
-	{
-		std::cerr << "C" << std::endl;
+	if (listen(_fds[_fdsNbr], 10) == -1)
 		exitError();
-	}
-	if (listen(_fds[_fdsNbr], 1) == -1)
-	{
-		std::cerr << "D" << std::endl;
-		exitError();
-	}
 	_fdsNbr++;
+}
+
+void	Data::pollLoop(void)
+{
+	struct sockaddr_storage their_addr;
+    socklen_t 				addr_size;
+	int						newFd;
+
+	newFd = accept(_fds[0], (struct sockaddr *)&their_addr, &addr_size);
+	if (newFd == -1)
+		exitError();
+	send(getFd(0), "controle fiscal\n", 16, 0);
+	recv(newFd, )
 }
 
 int	Data::getFd(int index)
