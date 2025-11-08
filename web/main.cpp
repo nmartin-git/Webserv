@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 22:51:07 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/03 16:15:02 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/08 16:27:21 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ int client(Data *data)
 int	main(int ac, char **av)
 {
 	Data	data;
-	int		fdClient;
 
 	if (ac != 2)
 	{
@@ -39,9 +38,7 @@ int	main(int ac, char **av)
 	(void)av;
 	//parsing conf file
 	data.setAddrinfo();
-	data.addSocket();
-	fdClient = client(&data);
+	data.addListener();
 	data.pollLoop();
-	close(fdClient);
 	data.clean();
 }

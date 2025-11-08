@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/03 14:48:23 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/08 16:27:07 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@
 #include <cstdlib>
 #include <cerrno>
 #include <unistd.h>
+#include <poll.h>
 
-#define MAX_FDS 1
+#define MAX_FDS 250
 
 class	Data
 {
@@ -30,7 +31,8 @@ class	Data
 		~Data();
 		void			setAddrinfo(void);
 		struct addrinfo	*getAddrinfo(void);
-		void			addSocket(void);
+		void			addListener(void);
+		void			newClient(int fd);
 		void			pollLoop(void);
 		int				getFd(int index);
 		void			clean(void);
@@ -40,6 +42,6 @@ class	Data
 	private:
 
 		struct addrinfo	*_addrinfo;
-		int				_fds[MAX_FDS];
+		struct pollfd	_fds[MAX_FDS];
 		int				_fdsNbr;
 };

@@ -6,16 +6,18 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/03 16:15:21 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/08 19:43:44 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-#define PORT "8080"
+#define PORT "6969"
 
 Data::Data() : _addrinfo(NULL), _fdsNbr(0)
 {
+	for (int i = 0; i < MAX_FDS; i++)
+		_fds[i].fd = -1;
 }
 
 Data::~Data()
@@ -44,37 +46,100 @@ struct addrinfo	*Data::getAddrinfo(void)
 	return (_addrinfo);
 }
 
-void	Data::addSocket(void)
+void	Data::addListener(void)
 {
 	// if (_fdsNbr >= MAX_FDS)//handle
-	_fds[_fdsNbr] = socket(_addrinfo->ai_family, _addrinfo->ai_socktype, _addrinfo->ai_protocol);
-	if (_fds[_fdsNbr] == -1)
+	_fds[_fdsNbr].fd = socket(_addrinfo->ai_family, _addrinfo->ai_socktype, _addrinfo->ai_protocol);
+	if (_fds[_fdsNbr].fd == -1)
 		exitError();
+	_fds[_fdsNbr].events = POLLIN;
 	int yes = 1;
-	setsockopt(_fds[_fdsNbr], SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-	if (bind(_fds[_fdsNbr], _addrinfo->ai_addr, _addrinfo->ai_addrlen) == -1)
+	setsockopt(_fds[_fdsNbr].fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+	if (bind(_fds[_fdsNbr].fd, _addrinfo->ai_addr, _addrinfo->ai_addrlen) == -1)
 		exitError();
-	if (listen(_fds[_fdsNbr], 10) == -1)
+	if (listen(_fds[_fdsNbr].fd, 10) == -1)
 		exitError();
 	_fdsNbr++;
 }
 
-void	Data::pollLoop(void)
+void	Data::newClient(int listener)
 {
 	struct sockaddr_storage their_addr;
-    socklen_t 				addr_size;
+    socklen_t 				addr_size(sizeof(their_addr));
 	int						newFd;
-
-	newFd = accept(_fds[0], (struct sockaddr *)&their_addr, &addr_size);
+	
+	// char					buffer[1024];
+    // ssize_t					bytes_received;
+	newFd = accept(listener, (struct sockaddr *)&their_addr, &addr_size);//faire une loop normalement ?
 	if (newFd == -1)
 		exitError();
-	send(getFd(0), "controle fiscal\n", 16, 0);
-	recv(newFd, )
+	for (int i = 0; i < MAX_FDS; i++)
+	{
+		if (_fds[i].fd == -1)
+		{
+			_fds[i].fd = newFd;
+			_fds[i].events = POLLIN;
+			_fdsNbr++;
+			std::cout << "new Client!" << std::endl;
+			// if (send(newFd, "controle fiscal\n", 16, 0) == -1)
+			// 	exitError();
+			// bytes_received = recv(newFd, buffer, sizeof(buffer) - 1, 0);
+  		  	// if (bytes_received == -1)
+    		// 	exitError();
+    		// buffer[bytes_received] = '\0';
+    		// std::cout << buffer << std::endl;
+			return ;
+		}
+	}
+	std::cerr << "Error: Serveur is full!" << std::endl;
+}
+
+void	Data::pollLoop(void)
+{
+	// char					buffer[1024];
+    // ssize_t					bytes_received;
+	int						pollV;
+
+	while (1)
+	{
+		pollV = poll(_fds, _fdsNbr, 1000);
+		if (pollV == -1)
+			exitError();
+		else if (pollV == 0)
+			continue ;
+		else if (_fds[0].revents & POLLIN)
+		{
+			newClient(_fds[0].fd);
+			pollV--;
+		}
+		else
+		{
+			for (int i = 1; i < _fdsNbr; i++)
+			{
+				if (pollV == 0)
+					break;
+				// else if (_fds[i].revents & POLLIN)
+				// 	send
+				else if (_fds[i].revents & POLLHUP)
+					_fds[i].fd = -1;
+				
+			}
+		}
+		
+		// if (send(newFd, "controle fiscal\n", 16, 0) == -1)
+		// 	exitError();
+		// bytes_received = recv(newFd, buffer, sizeof(buffer) - 1, 0);
+    	// if (bytes_received == -1)
+    	// 	exitError();
+    	// buffer[bytes_received] = '\0';
+    	// std::cout << buffer << std::endl;
+    	// close(newFd);
+	}
 }
 
 int	Data::getFd(int index)
 {
-	return (_fds[index]);
+	return (_fds[index].fd);
 }
 
 void	Data::clean(void)
@@ -82,7 +147,7 @@ void	Data::clean(void)
 	if(_addrinfo)
 		freeaddrinfo(_addrinfo);
 	for (int i = 0; i < _fdsNbr; i++)
-		close(_fds[i]);
+		close(_fds[i].fd);
 }
 
 void	Data::exit(int	status)
