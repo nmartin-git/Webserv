@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/08 16:27:07 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/11 20:23:55 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <poll.h>
 
 #define MAX_FDS 250
+#define READ_BUFFER 8192
 
 class	Data
 {
@@ -33,6 +34,8 @@ class	Data
 		struct addrinfo	*getAddrinfo(void);
 		void			addListener(void);
 		void			newClient(int fd);
+		void			sendResponse(int index);
+		void			clientRequest(int index);
 		void			pollLoop(void);
 		int				getFd(int index);
 		void			clean(void);
@@ -45,3 +48,7 @@ class	Data
 		struct pollfd	_fds[MAX_FDS];
 		int				_fdsNbr;
 };
+
+//---dataTransfer.cpp
+void	sendData(int fd, std::string data);
+std::string	&recvData(int fd);

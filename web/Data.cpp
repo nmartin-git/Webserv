@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/08 19:43:44 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/11 19:46:40 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,38 @@ void	Data::newClient(int listener)
 	std::cerr << "Error: Serveur is full!" << std::endl;
 }
 
+void	Data::sendResponse(int index)
+{
+	std::string response;
+	response = "HTTP/1.1 200 OK\r\n";
+	response += "Date: Tue, 11 Nov 2025 17:19:30 GMT\r\n";
+	response += "Server: MonServeur/1.0\r\n";
+	response += "Content-Type: text/html; charset=utf-8\r\n";
+	response += "Content-Length: 62\r\n";
+	response += "Connection: keep-alive\r\n";
+	response += "\r\n";
+	response += "<html><head><title>Home</title></head><body>Welcome!</body></html>";
+	sendData(_fds[index].fd, response);
+	_fds[index].events = POLLOUT;
+}
+
+void	Data::clientRequest(int index)
+{
+	char					buffer[1024];
+	std::string				request;
+    ssize_t					bytes_received;
+
+	std::cout << "New request from client N." << index << "!" << std::endl;
+	bytes_received = recv(_fds[index].fd, buffer, sizeof(buffer) - 1, 0);
+  	if (bytes_received == -1)
+    	exitError();
+    buffer[bytes_received] = '\0';
+    std::cout << buffer << std::endl;
+	
+	if (request.compare(0, 16, "GET / HTTP/1.1\r\n") == 0)
+	
+}
+
 void	Data::pollLoop(void)
 {
 	// char					buffer[1024];
@@ -118,11 +150,21 @@ void	Data::pollLoop(void)
 			{
 				if (pollV == 0)
 					break;
-				// else if (_fds[i].revents & POLLIN)
-				// 	send
+				else if (_fds[i].revents & POLLIN)
+				{
+					clientRequest(i);
+					pollV--;
+				}
+				// else if (_fds[i].revents & POLLOUT)
+				// {
+				// 	clientRequest(i);
+				// 	pollV--;
+				// }
 				else if (_fds[i].revents & POLLHUP)
+				{
 					_fds[i].fd = -1;
-				
+					pollV--;
+				}
 			}
 		}
 		
@@ -147,7 +189,10 @@ void	Data::clean(void)
 	if(_addrinfo)
 		freeaddrinfo(_addrinfo);
 	for (int i = 0; i < _fdsNbr; i++)
-		close(_fds[i].fd);
+	{
+		if (_fds[i].fd != -1)
+			close(_fds[i].fd);
+	}
 }
 
 void	Data::exit(int	status)
