@@ -6,11 +6,12 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/11 19:46:40 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/16 22:15:50 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "Connection.hpp"
 
 #define PORT "6969"
 
@@ -94,36 +95,18 @@ void	Data::newClient(int listener)
 	std::cerr << "Error: Serveur is full!" << std::endl;
 }
 
-void	Data::sendResponse(int index)
-{
-	std::string response;
-	response = "HTTP/1.1 200 OK\r\n";
-	response += "Date: Tue, 11 Nov 2025 17:19:30 GMT\r\n";
-	response += "Server: MonServeur/1.0\r\n";
-	response += "Content-Type: text/html; charset=utf-8\r\n";
-	response += "Content-Length: 62\r\n";
-	response += "Connection: keep-alive\r\n";
-	response += "\r\n";
-	response += "<html><head><title>Home</title></head><body>Welcome!</body></html>";
-	sendData(_fds[index].fd, response);
-	_fds[index].events = POLLOUT;
-}
-
 void	Data::clientRequest(int index)
 {
-	char					buffer[1024];
 	std::string				request;
-    ssize_t					bytes_received;
 
 	std::cout << "New request from client N." << index << "!" << std::endl;
-	bytes_received = recv(_fds[index].fd, buffer, sizeof(buffer) - 1, 0);
-  	if (bytes_received == -1)
-    	exitError();
-    buffer[bytes_received] = '\0';
-    std::cout << buffer << std::endl;
-	
-	if (request.compare(0, 16, "GET / HTTP/1.1\r\n") == 0)
-	
+	_connections[_fds[index].fd] = Connection(_fds[index]);
+	if (_fds[index].revents & POLLIN)
+		_connections[_fds[index].fd].pollIn();
+	else if (_fds[index].revents & POLLOUT)
+		_connections[_fds[index].fd].pollOut();
+	std::cout << "finished" <<std::endl;
+	_connections[_fds[index].fd].~Connection();
 }
 
 void	Data::pollLoop(void)
@@ -155,11 +138,11 @@ void	Data::pollLoop(void)
 					clientRequest(i);
 					pollV--;
 				}
-				// else if (_fds[i].revents & POLLOUT)
-				// {
-				// 	clientRequest(i);
-				// 	pollV--;
-				// }
+				else if (_fds[i].revents & POLLOUT)
+				{
+					clientRequest(i);
+					pollV--;
+				}
 				else if (_fds[i].revents & POLLHUP)
 				{
 					_fds[i].fd = -1;

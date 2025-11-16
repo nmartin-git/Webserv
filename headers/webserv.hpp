@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/11 20:23:55 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/16 20:05:54 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,35 +20,33 @@
 #include <cerrno>
 #include <unistd.h>
 #include <poll.h>
+#include <map>
 
 #define MAX_FDS 250
-#define READ_BUFFER 8192
+
+class Connection;
 
 class	Data
 {
 	public:
-
-		Data();
-		~Data();
-		void			setAddrinfo(void);
-		struct addrinfo	*getAddrinfo(void);
-		void			addListener(void);
-		void			newClient(int fd);
-		void			sendResponse(int index);
-		void			clientRequest(int index);
-		void			pollLoop(void);
-		int				getFd(int index);
-		void			clean(void);
-		void			exit(int status);
-		void			exitError(void);
-
+	
+	Data();
+	~Data();
+	void			setAddrinfo(void);
+	struct addrinfo	*getAddrinfo(void);
+	void			addListener(void);
+	void			newClient(int fd);
+	void			clientRequest(int index);
+	void			pollLoop(void);
+	int				getFd(int index);
+	void			clean(void);
+	void			exit(int status);
+	void			exitError(void);
+	
 	private:
 
-		struct addrinfo	*_addrinfo;
-		struct pollfd	_fds[MAX_FDS];
-		int				_fdsNbr;
+	struct addrinfo	*			_addrinfo;
+	struct pollfd				_fds[MAX_FDS];
+	std::map<int, Connection>	_connections;
+	int							_fdsNbr;
 };
-
-//---dataTransfer.cpp
-void	sendData(int fd, std::string data);
-std::string	&recvData(int fd);

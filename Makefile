@@ -6,7 +6,7 @@
 #    By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/05 15:41:03 by nmartin           #+#    #+#              #
-#    Updated: 2025/11/03 14:49:40 by nmartin          ###   ########.fr        #
+#    Updated: 2025/11/14 17:33:05 by nmartin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ CC = c++
 CFLAGS = -std=c++98 -Wall -Werror -Wextra -MMD -MP -g3
 NAME = webserv
 WEB_PATH = ./web/
-WEB_FILES = main.cpp Data.cpp
+WEB_FILES = main.cpp Data.cpp Connection.cpp
 WEB := $(addprefix $(WEB_PATH), $(WEB_FILES))
 OBJ_PATH = ./objs/
 OBJ := $(addprefix $(OBJ_PATH), $(WEB_FILES:.cpp=.o))
