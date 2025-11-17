@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/16 20:05:54 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/17 22:02:18 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <poll.h>
 #include <map>
+#include <sstream>
+#include <fstream>
 
 #define MAX_FDS 250
 

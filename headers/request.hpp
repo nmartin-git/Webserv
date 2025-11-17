@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Connection.hpp                                     :+:      :+:    :+:   */
+/*   request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/16 22:25:52 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/17 21:48:18 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,13 @@ class	Connection
 	~Connection();
 	void		sendData(std::string &data);
 	void		recvData(void);
+	void		requestData(void);
+
+	void		send404(void);
 	void		sendResponse(void);
+	void		sendIcon(void);
+	void		get(void);
+
 	void		pollOut(void);
 	void		pollIn(void);
 	
@@ -37,5 +43,5 @@ class	Connection
 	size_t			_write_offset;
 	std::string 	_method;
 	std::string 	_uri;
-	std::string 	_http;
+	std::string 	_version;
 };

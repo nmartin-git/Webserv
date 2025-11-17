@@ -6,11 +6,11 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/16 22:33:48 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/17 22:45:27 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Connection.hpp"
+#include "request.hpp"
 
 Connection::Connection() : _write_offset(0)
 {
@@ -49,12 +49,12 @@ void	Connection::sendData(std::string &data)
 void	Connection::recvData(void)
 {
 	char	buffer[BUFFER_SIZE];
-	size_t	received(0);
+	ssize_t	received(0);
 
 	_read_buf.clear();
 	while (true)
 	{
-		received = recv(_fd.fd, &buffer, BUFFER_SIZE - 1, MSG_DONTWAIT);
+		received = recv(_fd.fd, buffer, BUFFER_SIZE - 1, MSG_DONTWAIT);
 		if (received > 0)
 		{
 			buffer[received] = '\0';
@@ -62,24 +62,22 @@ void	Connection::recvData(void)
 		}
 		else
 			break;
-		return ;
 	}
 }
 
-void	Connection::sendResponse(void)
+void	Connection::requestData(void)
 {
-	std::string response;
-	response = "HTTP/1.1 200 OK\r\n";
-	response += "Date: Tue, 11 Nov 2025 17:19:30 GMT\r\n";
-	response += "Server: MonServeur/1.0\r\n";
-	response += "Content-Type: text/html; charset=utf-8\r\n";
-	response += "Content-Length: 62\r\n";
-	response += "Connection: keep-alive\r\n";
-	response += "\r\n";
-	response += "<html><head><title>Home</title></head><body>Welcome!</body></html>";
-	sendData(response);
-	_fd.events = POLLOUT;
-	_write_offset += 0;
+	std::istringstream	flx(_read_buf);
+	std::string			line;
+
+	if (std::getline(flx, line))
+	{
+		if (!line.empty() && line[line.size() - 1] == '\r')
+			line.erase(line.size() - 1);
+		std::istringstream	request(line);
+		request >> _method >> _uri >> _version;
+		std::cout << "Method: " << _method << " URI: " << _uri << " Version: " << _version << std::endl;
+	}
 }
 
 void	Connection::pollOut(void)
@@ -91,11 +89,9 @@ void	Connection::pollOut(void)
 
 void	Connection::pollIn(void)
 {
-	std::string				request;
-
 	recvData();
-	std::cout << "\"" << _read_buf << "\"" <<std::endl;
-	if (_read_buf.compare(0, 16, "GET / HTTP/1.1\r\n") == 0)
-		sendResponse();
-	std::cout << "pollin" <<std::endl;
+	std::cout << _read_buf << std::endl;
+	requestData();
+	if (_method == "GET")
+		get();
 }

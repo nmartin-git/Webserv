@@ -6,12 +6,12 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/16 22:15:50 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/17 22:46:53 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
-#include "Connection.hpp"
+#include "request.hpp"
 
 #define PORT "6969"
 
@@ -106,13 +106,10 @@ void	Data::clientRequest(int index)
 	else if (_fds[index].revents & POLLOUT)
 		_connections[_fds[index].fd].pollOut();
 	std::cout << "finished" <<std::endl;
-	_connections[_fds[index].fd].~Connection();
 }
 
 void	Data::pollLoop(void)
 {
-	// char					buffer[1024];
-    // ssize_t					bytes_received;
 	int						pollV;
 
 	while (1)
@@ -150,15 +147,6 @@ void	Data::pollLoop(void)
 				}
 			}
 		}
-		
-		// if (send(newFd, "controle fiscal\n", 16, 0) == -1)
-		// 	exitError();
-		// bytes_received = recv(newFd, buffer, sizeof(buffer) - 1, 0);
-    	// if (bytes_received == -1)
-    	// 	exitError();
-    	// buffer[bytes_received] = '\0';
-    	// std::cout << buffer << std::endl;
-    	// close(newFd);
 	}
 }
 

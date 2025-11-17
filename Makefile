@@ -6,7 +6,7 @@
 #    By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/05 15:41:03 by nmartin           #+#    #+#              #
-#    Updated: 2025/11/14 17:33:05 by nmartin          ###   ########.fr        #
+#    Updated: 2025/11/17 22:35:23 by nmartin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,10 +20,14 @@ CC = c++
 CFLAGS = -std=c++98 -Wall -Werror -Wextra -MMD -MP -g3
 NAME = webserv
 WEB_PATH = ./web/
-WEB_FILES = main.cpp Data.cpp Connection.cpp
+WEB_FILES = main.cpp Data.cpp
 WEB := $(addprefix $(WEB_PATH), $(WEB_FILES))
+REQUEST_PATH = ./request/
+REQUEST_FILES = Connection.cpp get.cpp
+REQUEST := $(addprefix $(REQUEST_PATH), $(REQUEST_FILES))
 OBJ_PATH = ./objs/
-OBJ := $(addprefix $(OBJ_PATH), $(WEB_FILES:.cpp=.o))
+OBJ := $(addprefix $(OBJ_PATH), $(WEB_FILES:.cpp=.o)) \
+		$(addprefix $(OBJ_PATH), $(REQUEST_FILES:.cpp=.o))
 SRC_BNS_PATH =
 SRC_BNS_FILES =
 SRC_BNS := $(addprefix $(SRC_BNS_PATH), $(SRC_BNS_FILES))
@@ -41,7 +45,13 @@ $(NAME) : $(OBJ)
 	@printf "\r\033[K"
 
 $(OBJ_PATH)%.o : $(WEB_PATH)%.cpp
-	@printf "$(BLUE)Compiling $(NAME): [$<] $(RESET)"
+	@printf "$(BLUE)Compiling $(NAME) /webserv: [$<] $(RESET)"
+	@mkdir -p $(OBJ_PATH)
+	@$(CC) $(CFLAGS) $(HEADERS) -c $< -o $@
+	@printf "\r\033[K"
+
+$(OBJ_PATH)%.o : $(REQUEST_PATH)%.cpp
+	@printf "$(BLUE)Compiling $(NAME) /request: [$<] $(RESET)"
 	@mkdir -p $(OBJ_PATH)
 	@$(CC) $(CFLAGS) $(HEADERS) -c $< -o $@
 	@printf "\r\033[K"
