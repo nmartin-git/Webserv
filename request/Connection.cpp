@@ -6,20 +6,20 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/17 22:45:27 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/18 19:25:28 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
 
-Connection::Connection() : _write_offset(0)
+Connection::Connection() : _write_offset(0), _close (false)
 {
 	_fd.fd = -1;
     _fd.events = 0;
     _fd.revents = 0;
 }
 
-Connection::Connection(struct pollfd &fd) : _fd(fd), _write_offset(0)
+Connection::Connection(struct pollfd &fd) : _fd(fd), _write_offset(0), _close (false)
 {
 	_read_buf.reserve(8162);
 	_write_buf.reserve(8162);
@@ -76,8 +76,10 @@ void	Connection::requestData(void)
 			line.erase(line.size() - 1);
 		std::istringstream	request(line);
 		request >> _method >> _uri >> _version;
-		std::cout << "Method: " << _method << " URI: " << _uri << " Version: " << _version << std::endl;
+		// std::cout << "Method: " << _method << " URI: " << _uri << " Version: " << _version << std::endl;
 	}
+	if (_read_buf.find("Connection: close") != std::string::npos)
+		_close = true;
 }
 
 void	Connection::pollOut(void)
@@ -94,4 +96,9 @@ void	Connection::pollIn(void)
 	requestData();
 	if (_method == "GET")
 		get();
+}
+
+bool	Connection::closeRequest(void)
+{
+	return (_close);
 }

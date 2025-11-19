@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/17 22:46:53 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/18 18:16:44 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,19 @@ void	Data::clientRequest(int index)
 	std::cout << "New request from client N." << index << "!" << std::endl;
 	_connections[_fds[index].fd] = Connection(_fds[index]);
 	if (_fds[index].revents & POLLIN)
-		_connections[_fds[index].fd].pollIn();
+	{	std::cout << "pollin !" << std::endl;
+		_connections[_fds[index].fd].pollIn();}
 	else if (_fds[index].revents & POLLOUT)
 		_connections[_fds[index].fd].pollOut();
 	std::cout << "finished" <<std::endl;
+	if (_connections[_fds[index].fd].closeRequest())
+	{
+		_connections.erase(_fds[index].fd);
+	    close(_fds[index].fd);
+	    _fds[index].fd = -1;
+	    _fdsNbr--;
+		std::cout << index << "closed !" << std::endl;
+	}
 }
 
 void	Data::pollLoop(void)
@@ -126,10 +135,12 @@ void	Data::pollLoop(void)
 		}
 		else
 		{
-			for (int i = 1; i < _fdsNbr; i++)
+			for (int i = 1; i < MAX_FDS; i++)
 			{
 				if (pollV == 0)
 					break;
+				if (_fds[i].fd == -1)
+					continue;
 				else if (_fds[i].revents & POLLIN)
 				{
 					clientRequest(i);
@@ -142,6 +153,8 @@ void	Data::pollLoop(void)
 				}
 				else if (_fds[i].revents & POLLHUP)
 				{
+					std::cout << i << "disconnected !" << std::endl;
+					close(_fds[i].fd);
 					_fds[i].fd = -1;
 					pollV--;
 				}

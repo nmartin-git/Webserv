@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 22:51:07 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/08 16:27:21 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/18 16:58:53 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	main(int ac, char **av)
 		exit(2);
 	}
 	(void)av;
-	//parsing conf file
+	//parsing conf file//JOUDY au charbon
 	data.setAddrinfo();
 	data.addListener();
 	data.pollLoop();

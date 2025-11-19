@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/17 21:48:18 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/18 19:24:05 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,16 @@ class	Connection
 
 	void		pollOut(void);
 	void		pollIn(void);
+	bool		closeRequest(void);
 	
 	private:
 	
 	struct pollfd	_fd;
 	std::string 	_read_buf;
-	std::string		_write_buf;
-	size_t			_write_offset;
+	std::string		_write_buf;//pas utile
+	size_t			_write_offset;//pas utile
 	std::string 	_method;
 	std::string 	_uri;
 	std::string 	_version;
+	bool			_close;
 };
