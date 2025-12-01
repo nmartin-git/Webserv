@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/18 19:25:28 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/01 14:13:46 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 
 Connection::Connection() : _write_offset(0), _close (false)
 {
-	_fd.fd = -1;
-    _fd.events = 0;
-    _fd.revents = 0;
+	_fd = NULL;
 }
 
-Connection::Connection(struct pollfd &fd) : _fd(fd), _write_offset(0), _close (false)
+Connection::Connection(struct pollfd *fd) : _fd(fd), _write_offset(0), _close (false)
 {
 	_read_buf.reserve(8162);
 	_write_buf.reserve(8162);
@@ -29,21 +27,22 @@ Connection::~Connection()
 {
 }
 
-void	Connection::sendData(std::string &data)
+void	Connection::sendData(void)
 {
-	size_t	total(0);
 	size_t	n;
 
-	while (total < data.size())
+	_write_offset = 0;
+	while (_write_offset < _write_buf.size())
 	{
-        n = send(_fd.fd, data.c_str() + total, data.size() - total, 0);
-		if (n > 0)
-            total += n;
+        n = send(_fd->fd, _write_buf.c_str() + _write_offset, _write_buf.size() - _write_offset, 0);
+		if (n > 0){std::cout << n << " ";
+            _write_offset += n;}
 		// else
 		// {
 		// 	//TODO handle error
 		// }
 	}
+	std::cout << std::endl;
 }
 
 void	Connection::recvData(void)
@@ -54,11 +53,16 @@ void	Connection::recvData(void)
 	_read_buf.clear();
 	while (true)
 	{
-		received = recv(_fd.fd, buffer, BUFFER_SIZE - 1, MSG_DONTWAIT);
+		received = recv(_fd->fd, buffer, BUFFER_SIZE - 1, MSG_DONTWAIT);
 		if (received > 0)
 		{
 			buffer[received] = '\0';
 			_read_buf += buffer;
+		}
+		else if (received == 0)
+		{
+			_close = true;
+			break;
 		}
 		else
 			break;
@@ -87,15 +91,21 @@ void	Connection::pollOut(void)
 	std::string				response;
 
 	recvData();
+	_fd->events = POLLIN;
 }
 
 void	Connection::pollIn(void)
 {
 	recvData();
+	if (_close || _read_buf.empty())
+		return;
 	std::cout << _read_buf << std::endl;
 	requestData();
 	if (_method == "GET")
 		get();
+	// else if (_method == "POST")
+	// 	post();
+	_fd->events = POLLOUT;
 }
 
 bool	Connection::closeRequest(void)

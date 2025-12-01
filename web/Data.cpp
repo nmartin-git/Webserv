@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/18 18:16:44 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/11/21 17:15:43 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,13 +99,14 @@ void	Data::clientRequest(int index)
 {
 	std::string				request;
 
-	std::cout << "New request from client N." << index << "!" << std::endl;
-	_connections[_fds[index].fd] = Connection(_fds[index]);
+	std::cout << "New request from client N." << index << "!" << _fds[index].fd <<std::endl;
+	_connections[_fds[index].fd] = Connection(&_fds[index]);
 	if (_fds[index].revents & POLLIN)
 	{	std::cout << "pollin !" << std::endl;
 		_connections[_fds[index].fd].pollIn();}
 	else if (_fds[index].revents & POLLOUT)
-		_connections[_fds[index].fd].pollOut();
+	{std::cout << "pollout !" << std::endl;
+		_connections[_fds[index].fd].pollOut();}
 	std::cout << "finished" <<std::endl;
 	if (_connections[_fds[index].fd].closeRequest())
 	{
@@ -151,7 +152,7 @@ void	Data::pollLoop(void)
 					clientRequest(i);
 					pollV--;
 				}
-				else if (_fds[i].revents & POLLHUP)
+				else if (_fds[i].revents & POLLHUP || _fds[i].revents & POLLERR)
 				{
 					std::cout << i << "disconnected !" << std::endl;
 					close(_fds[i].fd);
