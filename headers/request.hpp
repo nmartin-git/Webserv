@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/01 15:45:14 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/04 23:38:18 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 #include "webserv.hpp"
 
 #define BUFFER_SIZE 1024
+
+typedef	struct s_upload
+{
+	std::string	filename;
+	size_t		contentLength;
+}				t_upload;
 
 class	Connection
 {
@@ -32,6 +38,7 @@ class	Connection
 	void		sendIcon(void);
 	void		get(void);
 
+	void		getFilename(t_upload *data);
 	void		upload(void);
 	void		post(void);
 

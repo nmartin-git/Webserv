@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/21 17:15:43 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/02 13:46:43 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,10 @@ struct addrinfo	*Data::getAddrinfo(void)
 
 void	Data::addListener(void)
 {
-	// if (_fdsNbr >= MAX_FDS)//handle
 	_fds[_fdsNbr].fd = socket(_addrinfo->ai_family, _addrinfo->ai_socktype, _addrinfo->ai_protocol);
 	if (_fds[_fdsNbr].fd == -1)
+		exitError();
+	if (fcntl(_fds[_fdsNbr].fd, F_SETFL, O_NONBLOCK) == -1)
 		exitError();
 	_fds[_fdsNbr].events = POLLIN;
 	int yes = 1;

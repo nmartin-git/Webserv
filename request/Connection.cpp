@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/01 14:13:46 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/02 14:27:06 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ void	Connection::pollIn(void)
 	requestData();
 	if (_method == "GET")
 		get();
-	// else if (_method == "POST")
-	// 	post();
+	else if (_method == "POST")
+		post();
 	_fd->events = POLLOUT;
 }
 

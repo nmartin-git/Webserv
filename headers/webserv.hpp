@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/25 20:54:02 by nmartin           #+#    #+#             */
-/*   Updated: 2025/11/17 22:02:18 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/04 22:29:09 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <fcntl.h>
+
+#include <ctime>
+#include <sys/time.h>
+#include <unistd.h>
 
 #define MAX_FDS 250
 
@@ -52,3 +57,5 @@ class	Data
 	std::map<int, Connection>	_connections;
 	int							_fdsNbr;
 };
+
+std::string	getTimestamp(void);

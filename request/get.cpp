@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:31:37 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/01 12:09:18 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/04 17:51:47 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	Connection::sendResponse(std::string filename)
 void	Connection::sendIcon(void)
 {
 	std::cout << "icon" << std::endl;
-	std::ifstream	icon("Imran.ico", std::ios::binary);
+	std::ifstream	icon("website/Imran.ico", std::ios::binary);
 	std::string		length;
 	std::ostringstream size;
 
@@ -78,9 +78,11 @@ void	Connection::get(void)
 {
 	// std::cout << _uri <<std::endl;
 	if (_uri == "/")
-		sendResponse("home.html");
+		sendResponse("website/home.html");
 	else if (_uri == "/favicon.ico")
 		sendIcon();
 	else if (_uri == "/upload")
-		sendResponse("upload.html");
+		sendResponse("website/upload.html");
+	// else if (_uri == "/cgi")
+	// 	execCgi();
 }
