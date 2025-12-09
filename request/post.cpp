@@ -6,13 +6,13 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:52:30 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/04 23:55:17 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/09 18:09:15 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
 
-void	Connection::getFilename(t_upload *data)
+void	Connection::getFilename(t_upload *data, size_t headersLength)
 {
 	std::istringstream	flx(_read_buf);
 	std::string			line;
@@ -27,7 +27,7 @@ void	Connection::getFilename(t_upload *data)
 	end = _read_buf.find("\r\n", index);
 	if (end == std::string::npos)
 		return ;
-	data->contentLength = atoi(_read_buf.substr(index + 16, end - index).c_str());
+	data->contentLength = atoi(_read_buf.substr(index + 16, end - index).c_str()) - headersLength;
 	while (std::getline(flx, line) && line.find("boundary=") == std::string::npos);
 	index = line.find("boundary=");
 	if (index == std::string::npos)
@@ -35,9 +35,7 @@ void	Connection::getFilename(t_upload *data)
 	if (!line.empty() && line[line.size() - 1] == '\r')
 		line.erase(line.size() - 1);
 	next_line = line.substr(index + strlen("boundary="));
-	std::cout << "==//=" << next_line << "==//=" << std::endl;
 	while (std::getline(flx, line) && line.find(next_line) == std::string::npos);
-	std::cout << "==//=" << line << "==//=" << std::endl;
 	std::getline(flx, line);
 	index = line.find("filename=\"");
 	if (index == std::string::npos)
@@ -59,27 +57,33 @@ void	Connection::upload(void)
 	size_t		file_size;
 	t_upload	data;
 
-	getFilename(&data);
-	std::cout << "Filename: " << data.filename << "   Content-Length: " << data.contentLength << std::endl;
-	if (data.filename.empty())
-		return ;
-	
-	// Trouver le début du contenu du fichier (après les headers multipart)
 	start = _read_buf.find("\r\n\r\n");
 	if (start == std::string::npos)
 		return ;
-	start = _read_buf.find("\r\n\r\n", start + 4);  // 2ème occurrence
-	if (start == std::string::npos)
-		return ;
-	start += 4;  // Sauter le \r\n\r\n
-	
-	// Trouver la fin du fichier (avant le boundary de fin)
-	end = _read_buf.find("\r\n--", start);
+	end = _read_buf.find("\r\n\r\n", start + 4);
 	if (end == std::string::npos)
 		return ;
+	getFilename(&data, end - start);
+	std::cout << data.filename << "   Content-Length body: " << data.contentLength << std::endl;
+	if (data.filename.empty())
+		return ;
+	
+	// Début du fichier = après le 2ème \r\n\r\n
+	start = end + 4;
+	
+	// Trouver la fin du fichier (avant le boundary de fermeture)
+	end = _read_buf.find("\r\n--", start);
+	if (end == std::string::npos)
+	{
+		std::cerr << "Error: boundary end not found!" << std::endl;
+		std::cerr << "Buffer size: " << _read_buf.size() << std::endl;
+		std::cerr << "Searching from pos: " << start << std::endl;
+		std::cerr << "Last 200 chars:\n[" << _read_buf.substr(_read_buf.size() - 200) << "]" << std::endl;
+		return ;
+	}
 	
 	file_size = end - start;
-	std::cout << "File start: " << start << " end: " << end << " size: " << file_size << std::endl;
+	std::cout << "File size: " << file_size << " bytes (from pos " << start << " to " << end << ")" << std::endl;
 	
 	std::ofstream file(data.filename.c_str(), std::ios::binary);
 	if (!file)

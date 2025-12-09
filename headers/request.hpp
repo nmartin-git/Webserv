@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/04 23:38:18 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/09 18:11:28 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class	Connection
 	void		sendIcon(void);
 	void		get(void);
 
-	void		getFilename(t_upload *data);
+	void		getFilename(t_upload *data, size_t headersLength);
 	void		upload(void);
 	void		post(void);
 
@@ -52,6 +52,7 @@ class	Connection
 	std::string 	_read_buf;
 	std::string		_write_buf;
 	size_t			_write_offset;
+	size_t			_expected_length;
 	std::string 	_method;
 	std::string 	_uri;
 	std::string 	_version;

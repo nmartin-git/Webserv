@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/02 13:46:43 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/09 18:38:41 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,6 @@ void	Data::newClient(int listener)
     socklen_t 				addr_size(sizeof(their_addr));
 	int						newFd;
 	
-	// char					buffer[1024];
-    // ssize_t					bytes_received;
 	newFd = accept(listener, (struct sockaddr *)&their_addr, &addr_size);//faire une loop normalement ?
 	if (newFd == -1)
 		exitError();
@@ -83,13 +81,6 @@ void	Data::newClient(int listener)
 			_fds[i].events = POLLIN;
 			_fdsNbr++;
 			std::cout << "new Client!" << std::endl;
-			// if (send(newFd, "controle fiscal\n", 16, 0) == -1)
-			// 	exitError();
-			// bytes_received = recv(newFd, buffer, sizeof(buffer) - 1, 0);
-  		  	// if (bytes_received == -1)
-    		// 	exitError();
-    		// buffer[bytes_received] = '\0';
-    		// std::cout << buffer << std::endl;
 			return ;
 		}
 	}
@@ -101,13 +92,24 @@ void	Data::clientRequest(int index)
 	std::string				request;
 
 	std::cout << "New request from client N." << index << "!" << _fds[index].fd <<std::endl;
-	_connections[_fds[index].fd] = Connection(&_fds[index]);
+	
+	// Créer la connexion seulement si elle n'existe pas encore
+	if (_connections.find(_fds[index].fd) == _connections.end())
+	{
+		_connections.insert(std::make_pair(_fds[index].fd, Connection(&_fds[index])));
+		std::cout << "New connection created for fd " << _fds[index].fd << std::endl;
+	}
+	
 	if (_fds[index].revents & POLLIN)
-	{	std::cout << "pollin !" << std::endl;
-		_connections[_fds[index].fd].pollIn();}
+	{
+		std::cout << "pollin !" << std::endl;
+		_connections[_fds[index].fd].pollIn();
+	}
 	else if (_fds[index].revents & POLLOUT)
-	{std::cout << "pollout !" << std::endl;
-		_connections[_fds[index].fd].pollOut();}
+	{
+		std::cout << "pollout !" << std::endl;
+		_connections[_fds[index].fd].pollOut();
+	}
 	std::cout << "finished" <<std::endl;
 	if (_connections[_fds[index].fd].closeRequest())
 	{
