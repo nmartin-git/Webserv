@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/09 18:45:48 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/09 19:08:17 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,29 +58,16 @@ void	Connection::recvData(void)
 	{
 		received = recv(_fd->fd, buffer, BUFFER_SIZE, MSG_DONTWAIT);
 		if (received > 0)
-		{
 			_read_buf.append(buffer, received);
-			std::cout << "recv() returned " << received << " bytes, total in buffer: " << _read_buf.size() << std::endl;
-		}
 		else if (received == 0)
 		{
-			std::cout << "recv() returned 0 (EOF), _expected_length=" << _expected_length << ", buffer size=" << _read_buf.size() << std::endl;
-			// Ne fermer que si on n'attend pas plus de données
 			if (_expected_length == 0 || _read_buf.size() >= _expected_length)
-			{
 				_close = true;
-				std::cout << "Setting _close = true" << std::endl;
-			}
 			break;
 		}
 		else
-		{
-			if (errno != EAGAIN && errno != EWOULDBLOCK)
-				std::cerr << "recv() error: " << strerror(errno) << std::endl;
-			break;
-		}
+			break;//TODO peut etre dangereux
 	}
-	std::cout << "recvData() finished: buffer=" << _read_buf.size() << " bytes, _close=" << _close << std::endl;
 }
 
 void Connection::requestData(void)
@@ -140,23 +127,18 @@ void	Connection::pollIn(void)
 			{
 				int content_len = atoi(_read_buf.substr(pos + 16, end - pos).c_str());
 				if (content_len > 0)
-				{
 					_expected_length = header_end + 4 + content_len;
-					std::cout << "Expecting total: " << _expected_length << " bytes (headers + " << content_len << " body)" << std::endl;
-				}
 			}
 		}
 	}
 	if (_expected_length > 0 && _read_buf.size() < _expected_length)
 	{
-		std::cout << "Receiving... " << _read_buf.size() << "/" << _expected_length << " bytes" << std::endl;
 		if (_close)
 		{
 			std::cerr << "Connection closed before receiving all data!" << std::endl;
 			_expected_length = 0;
 			return;
 		}
-		std::cout << "Keeping POLLIN active, waiting for more data..." << std::endl;
 		_fd->events = POLLIN;
 		return;
 	}
