@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 09:15:35 by efranco           #+#    #+#             */
-/*   Updated: 2025/12/10 19:13:22 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/10 19:26:54 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,9 @@ class Response
 	{
 		std::string result;
 
+		std::ostringstream length;
+		length << _body.size();
+		addHeader("Content-Length", length.str());
 		result = "HTTP/1.1 " + intToString(_statusCode) + " " + getStatusMessage(this->_statusCode)  + "\r\n";
 		for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end() ; ++it)
 		{
