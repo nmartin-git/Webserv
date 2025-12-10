@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:31:37 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/04 17:51:47 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/10 19:14:10 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 void	Connection::send404(void)
 {
+	_response.setStatus(404);
+	_response.addHeader("Content-Type", "text/html");
+	_response.setBody("<h1>404 - File Not Found</h1>");
 	_write_buf.clear();
-    _write_buf = "HTTP/1.1 404 Not Found\r\n";
-    _write_buf += "Content-Length: 0\r\n";
-    _write_buf += "Connection: close\r\n";
-    _write_buf += "\r\n";
+	_write_buf = _response.build();
     sendData();
 	_fd->events = POLLOUT;
 }
@@ -37,16 +37,12 @@ void	Connection::sendResponse(std::string filename)
 	file.close();
 	size << content.size();
 	length = size.str();
+	_response.setStatus(200);
+	_response.addHeader("Content-Type", _response.get_content_type(_uri));
+	_response.setBody(content);
+	// _write_buf += "Content-Length" + length + "\r\n";//TODO faire content length
 	_write_buf.clear();
-	_write_buf.clear();
-	_write_buf = "HTTP/1.1 200 OK\r\n";
-	_write_buf += "Date: Tue, 11 Nov 2025 17:19:30 GMT\r\n";
-	_write_buf += "Server: MonServeur/1.0\r\n";
-	_write_buf += "Content-Type: text/html; charset=utf-8\r\n";
-	_write_buf += "Content-Length" + length + "\r\n";
-	_write_buf += "Connection: keep-alive\r\n";
-	_write_buf += "\r\n";
-	_write_buf += content;
+	_write_buf = _response.build();
 	sendData();
 }
 
@@ -77,7 +73,9 @@ void	Connection::sendIcon(void)
 void	Connection::get(void)
 {
 	// std::cout << _uri <<std::endl;
-	if (_uri == "/")
+	/*if (is_cgi(_uri))
+        start_cgi(client, _uri);
+	else*/ if (_uri == "/")
 		sendResponse("website/home.html");
 	else if (_uri == "/favicon.ico")
 		sendIcon();

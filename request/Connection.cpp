@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/09 19:08:17 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/10 17:39:33 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,7 @@ void Connection::sendData(void)
 	{
 		n = send(_fd->fd, _write_buf.c_str() + _write_offset, _write_buf.size() - _write_offset, 0);
 		if (n > 0)
-		{
-			std::cout << n << " ";
 			_write_offset += n;
-		}
 		// else
 		// {
 		// 	//TODO handle error
@@ -51,6 +48,7 @@ void	Connection::recvData(void)
 {
 	char	buffer[BUFFER_SIZE];
 	ssize_t	received(0);
+	size_t	pos;
 
 	if (_expected_length == 0)
 		_read_buf.clear();	
@@ -58,7 +56,18 @@ void	Connection::recvData(void)
 	{
 		received = recv(_fd->fd, buffer, BUFFER_SIZE, MSG_DONTWAIT);
 		if (received > 0)
+		{
 			_read_buf.append(buffer, received);
+			pos =_read_buf.find("\r\n\r\n");
+			if (pos != std::string::npos)
+			{
+				_env.parse_query_string(_read_buf);
+				_env.search_cookie_string(_read_buf);
+				_env.extract_method(_read_buf);
+				_env.parse_headers(_read_buf);
+				return ;
+			}
+		}
 		else if (received == 0)
 		{
 			if (_expected_length == 0 || _read_buf.size() >= _expected_length)

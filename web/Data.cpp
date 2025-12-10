@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/09 18:38:41 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/10 17:21:15 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,22 @@ struct addrinfo	*Data::getAddrinfo(void)
 
 void	Data::addListener(void)
 {
+	int	flags;
+
 	_fds[_fdsNbr].fd = socket(_addrinfo->ai_family, _addrinfo->ai_socktype, _addrinfo->ai_protocol);
 	if (_fds[_fdsNbr].fd == -1)
 		exitError();
-	if (fcntl(_fds[_fdsNbr].fd, F_SETFL, O_NONBLOCK) == -1)
-		exitError();
+	flags = fcntl(_fds[_fdsNbr].fd, F_GETFL, 0);
+	if (flags == -1)
+	{
+		perror("fcntl F_GETFL");
+		return ;
+	}
+	if (fcntl(_fds[_fdsNbr].fd, F_SETFL, flags | O_NONBLOCK) == -1)
+	{
+		perror("fcntl F_SETFL");
+		return ;
+	}
 	_fds[_fdsNbr].events = POLLIN;
 	int yes = 1;
 	setsockopt(_fds[_fdsNbr].fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
@@ -93,7 +104,7 @@ void	Data::clientRequest(int index)
 
 	std::cout << "New request from client N." << index << "!" << _fds[index].fd <<std::endl;
 	
-	// Créer la connexion seulement si elle n'existe pas encore
+	// Créer la connexion seulement si elle n'existe pas encore//TODO
 	if (_connections.find(_fds[index].fd) == _connections.end())
 	{
 		_connections.insert(std::make_pair(_fds[index].fd, Connection(&_fds[index])));

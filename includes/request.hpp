@@ -6,12 +6,31 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/09 18:11:28 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/10 19:16:40 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <iostream>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <cstring>
+#include <cstdlib>
+#include <cerrno>
+#include <unistd.h>
+#include <poll.h>
+#include <map>
+#include <sstream>
+#include <fstream>
+#include <fcntl.h>
+
+#include <ctime>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include "Env.hpp"
+#include "Response.hpp"
 #include "webserv.hpp"
 
 #define BUFFER_SIZE 1024
@@ -56,5 +75,8 @@ class	Connection
 	std::string 	_method;
 	std::string 	_uri;
 	std::string 	_version;
+	Env				_env;
+	Response		_response;
+	
 	bool			_close;
 };
