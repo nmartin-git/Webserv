@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/10 19:16:40 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/11 21:53:29 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netdb.h>
 #include <cstring>
 #include <cstdlib>
@@ -24,14 +25,10 @@
 #include <sstream>
 #include <fstream>
 #include <fcntl.h>
-
-#include <ctime>
-#include <sys/time.h>
-#include <unistd.h>
-
 #include "Env.hpp"
 #include "Response.hpp"
 #include "webserv.hpp"
+#include "CGIExecution.hpp"
 
 #define BUFFER_SIZE 1024
 
@@ -57,6 +54,10 @@ class	Connection
 	void		sendIcon(void);
 	void		get(void);
 
+	void		set_cgi_env(void);
+	void		start_cgi(void);
+	void		handle_executing_cgi(int fd);
+
 	void		getFilename(t_upload *data, size_t headersLength);
 	void		upload(void);
 	void		post(void);
@@ -77,6 +78,6 @@ class	Connection
 	std::string 	_version;
 	Env				_env;
 	Response		_response;
-	
+	CGIExecution* 	_cgi;
 	bool			_close;
 };

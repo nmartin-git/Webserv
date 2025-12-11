@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 13:35:37 by efranco           #+#    #+#             */
-/*   Updated: 2025/12/11 00:59:39 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/11 21:57:58 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ struct		CGIExecution
 	}
 };
 
-void parse_cgi_output(CGIExecution *cgi)
+inline void parse_cgi_output(CGIExecution *cgi)
 {
     std::string output = cgi->output;
 
@@ -58,7 +58,7 @@ void parse_cgi_output(CGIExecution *cgi)
     }
 }
 
-void	parse_cgi_headers(const std::string &headers_section,
+inline void	parse_cgi_headers(const std::string &headers_section,
 		std::map<std::string, std::vector<std::string> >& parsed_headers)
 {
 
@@ -84,7 +84,7 @@ void	parse_cgi_headers(const std::string &headers_section,
 	}
 }
 
-int extractStatusCode(const std::string& str)
+inline int extractStatusCode(const std::string& str)
 {
 	size_t pos = str.find(' ');
 	std::string code_str;
@@ -96,7 +96,7 @@ int extractStatusCode(const std::string& str)
 	return (atoi(code_str.c_str()));
 }
 
-std::string build_cgi_response(CGIExecution *cgi, std::map<std::string,
+inline std::string build_cgi_response(CGIExecution *cgi, std::map<std::string,
 	std::vector<std::string> > &parsed_headers)
 {
 	Response response;

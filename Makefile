@@ -23,7 +23,7 @@ WEB_PATH = ./web/
 WEB_FILES = main.cpp Data.cpp
 WEB := $(addprefix $(WEB_PATH), $(WEB_FILES))
 REQUEST_PATH = ./request/
-REQUEST_FILES = Connection.cpp get.cpp post.cpp
+REQUEST_FILES = Connection.cpp get.cpp post.cpp CGI.cpp
 REQUEST := $(addprefix $(REQUEST_PATH), $(REQUEST_FILES))
 OBJ_PATH = ./objs/
 OBJ := $(addprefix $(OBJ_PATH), $(WEB_FILES:.cpp=.o)) \
