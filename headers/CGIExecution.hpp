@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 13:35:37 by efranco           #+#    #+#             */
-/*   Updated: 2025/12/09 20:07:56 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/11 00:59:39 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void parse_cgi_output(CGIExecution *cgi)
         cgi->cgi_body = output.substr(n + separator_length);
     }
 }
+
 void	parse_cgi_headers(const std::string &headers_section,
 		std::map<std::string, std::vector<std::string> >& parsed_headers)
 {
@@ -82,6 +83,7 @@ void	parse_cgi_headers(const std::string &headers_section,
 		parsed_headers[name].push_back(value);
 	}
 }
+
 int extractStatusCode(const std::string& str)
 {
 	size_t pos = str.find(' ');
@@ -93,6 +95,7 @@ int extractStatusCode(const std::string& str)
 
 	return (atoi(code_str.c_str()));
 }
+
 std::string build_cgi_response(CGIExecution *cgi, std::map<std::string,
 	std::vector<std::string> > &parsed_headers)
 {

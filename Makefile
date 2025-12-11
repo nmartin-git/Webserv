@@ -6,7 +6,7 @@
 #    By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/05 15:41:03 by nmartin           #+#    #+#              #
-#    Updated: 2025/12/10 17:40:47 by nmartin          ###   ########.fr        #
+#    Updated: 2025/12/11 19:06:29 by nmartin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ CC = c++
 CFLAGS = -std=c++98 -Wall -Werror -Wextra -MMD -MP -g3
 NAME = webserv
 WEB_PATH = ./web/
-WEB_FILES = main.cpp DAta.cpp
+WEB_FILES = main.cpp Data.cpp
 WEB := $(addprefix $(WEB_PATH), $(WEB_FILES))
 REQUEST_PATH = ./request/
 REQUEST_FILES = Connection.cpp get.cpp post.cpp

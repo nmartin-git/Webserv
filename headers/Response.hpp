@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 09:15:35 by efranco           #+#    #+#             */
-/*   Updated: 2025/12/10 19:26:54 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/11 19:18:38 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ class Response
 
 	std::string get_content_type(const std::string &path)
 	{
-    	size_t dot_pos = path. find_last_of('.');
+		std::cout << "++++++++++++++++++++++++" << path << "+++++++++++++++++++" << std::endl;
+    	size_t dot_pos = path.find_last_of('.');
     	if (dot_pos == std::string::npos)
     	    return "text/plain";
 		

@@ -17,11 +17,11 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
-bool isaspace(char c)
+inline bool isaspace(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
 }
-std::string trim(const std::string& str)
+inline std::string trim(const std::string& str)
 {
 	if (str.empty())
     	return "";
@@ -51,7 +51,7 @@ std::string trim(const std::string& str)
     }
 	return str.substr(start, end - start + 1);
 }
-std::vector<std::string> split(const std::string& str, const std::string& sep)
+inline std::vector<std::string> split(const std::string& str, const std::string& sep)
 {
 	std::vector<std::string> array;
 

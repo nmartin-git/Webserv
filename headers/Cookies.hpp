@@ -30,14 +30,14 @@ struct CookieAttributes
 	: maxAge(-1), path(""), domain(""), httpOnly(false), secure(false), sameSite("") {}
 };
 
-std::string intToString(int value)
+inline std::string intToString(int value)
 {
     std::stringstream ss;
     ss << value;
     return ss.str();
 }
 
-std::string buildSetCookieString(const std::string& name, const std::string& value, const CookieAttributes& attrs)
+inline std::string buildSetCookieString(const std::string& name, const std::string& value, const CookieAttributes& attrs)
 {
 	std::string result;
 
