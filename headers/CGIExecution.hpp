@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 13:35:37 by efranco           #+#    #+#             */
-/*   Updated: 2025/12/11 21:57:58 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/13 23:49:00 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,8 +118,7 @@ inline std::string build_cgi_response(CGIExecution *cgi, std::map<std::string,
 		}
 	}
 	response.setStatus(status_code);
-	response.addHeader("Content-Length", intToString(cgi->cgi_body.length()));
 	response.setBody(cgi->cgi_body);
-
+	std::cout << "!!!!!!!!!" << cgi->cgi_body << "!!!!!!!!!!" << std::endl;
 	return response.build();
 }

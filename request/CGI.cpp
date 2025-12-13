@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 20:08:27 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/11 21:52:57 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/13 23:52:25 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	Connection::set_cgi_env(void)
 
 void	Connection::start_cgi(void)
 {
-
     size_t derniere_barre = _uri.find_last_of('/');
     std::string nom_fichier = _uri.substr(derniere_barre + 1);
     std::string chemin_reel = "./" + nom_fichier;
@@ -96,10 +95,11 @@ void	Connection::start_cgi(void)
 		_cgi->pipe_fd = pipefd[0];
 		_cgi->output = "";
 		_cgi->completed = false;
+		handle_executing_cgi();
 	}
 }
 
-void	Connection::handle_executing_cgi(int fd)
+void	Connection::handle_executing_cgi(void)
 {
 	char		buffer[4096];
 	ssize_t		n;
@@ -121,7 +121,9 @@ void	Connection::handle_executing_cgi(int fd)
 				return ;
 			}
 		}
-		result = waitpid(_cgi->pid, &status, WNOHANG);
+		result = waitpid(_cgi->pid, &status, 0);
+		std ::cout << ";;;;;;;;;;;;;" << result << ";;;;;;" << std::endl;
+		//TODO body vide
 		if (result > 0)
 		{
 			_cgi->completed = true;
@@ -146,10 +148,12 @@ void	Connection::handle_executing_cgi(int fd)
     		{
         		parsed_headers["Content-Type"].push_back("text/html");
     		}
-
-			std::string httpResponse = build_cgi_response(_cgi, parsed_headers);
-			send(fd, httpResponse.c_str(), httpResponse.length(), 0);
-
+			_write_buf.clear();
+			_write_buf = build_cgi_response(_cgi, parsed_headers);
+			std::cout << "------------------------" << std::endl;
+			std::cout << _write_buf << std::endl;
+			std::cout << "------------------------" << std::endl;
+			sendData();
 			close(_cgi->pipe_fd);
 			delete _cgi;
 			_cgi = NULL;
