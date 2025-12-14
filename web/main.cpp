@@ -20,8 +20,6 @@
 #include "request.hpp"
 #include "webserv.hpp"
 
-#define FLAG 0
-
 std::string	getTimestamp(void)
 {
     struct tm time_info;

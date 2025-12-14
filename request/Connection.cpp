@@ -6,17 +6,17 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 23:04:14 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/10 17:39:33 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/14 23:43:15 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
 
-Connection::Connection() : _fd(NULL), _write_offset(0), _expected_length(0), _close(false)
+Connection::Connection() : _fd(NULL), _write_offset(0), _expected_length(0), _executing(false), _close(false)
 {
 }
 
-Connection::Connection(struct pollfd *fd) : _fd(fd), _write_offset(0), _expected_length(0), _close(false)
+Connection::Connection(struct pollfd *fd) : _fd(fd), _write_offset(0), _expected_length(0), _executing(false), _close(false)
 {
 	_read_buf.reserve(8162);
 	_write_buf.reserve(8162);
@@ -54,7 +54,9 @@ void	Connection::recvData(void)
 		_read_buf.clear();	
 	while (true)
 	{
+		std ::cout << _fd->fd;
 		received = recv(_fd->fd, buffer, BUFFER_SIZE, MSG_DONTWAIT);
+
 		if (received > 0)
 		{
 			_read_buf.append(buffer, received);

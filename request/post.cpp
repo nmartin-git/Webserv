@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 13:52:30 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/09 18:09:15 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/15 00:25:34 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,11 @@ void	Connection::getFilename(t_upload *data, size_t headersLength)
 	filename = "data/" + filename;
 	filename.insert(filename.find("."), getTimestamp());
 	data->filename = filename;
+}
+
+bool	Connection::getExec(void)
+{
+	return (_executing);
 }
 
 void	Connection::upload(void)
@@ -106,5 +111,6 @@ void	Connection::post(void)
 	}
 	if (_uri == "/upload")
 		upload();
-	
+	// else if (_uri == "/login.py")
+	// 	add_env
 }

@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/13 18:09:06 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/14 23:50:50 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,11 @@ void	Data::clientRequest(int index)
 	// Créer la connexion seulement si elle n'existe pas encore//TODO
 	if (_connections.find(_fds[index].fd) == _connections.end())
 	{
-		_connections.insert(std::make_pair(_fds[index].fd, Connection(&_fds[index])));
+		std::cout << "1[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]" << std ::endl;
+		_connections[_fds[index].fd] = Connection(&_fds[index]);
 		std::cout << "New connection created for fd " << _fds[index].fd << std::endl;
 	}
+	std::cout << "2[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]" << std ::endl;
 	
 	if (_fds[index].revents & POLLIN)
 	{
@@ -156,6 +158,8 @@ void	Data::pollLoop(void)
 					break;
 				if (_fds[i].fd == -1)
 					continue;
+				else if (_connections.find(_fds[i].fd) != _connections.end() && _connections[_fds[i].fd].getExec())
+					_connections[_fds[i].fd].handle_executing_cgi();
 				else if (_fds[i].revents & POLLIN)
 				{
 					clientRequest(i);

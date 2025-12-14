@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:31:37 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/11 21:07:35 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/15 00:24:50 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ void	Connection::sendIcon(void)
 
 void	Connection::get(void)
 {
-	// std::cout << _uri <<std::endl;
 	if (is_cgi(_uri))
         start_cgi();
 	else if (_uri == "/")
@@ -100,6 +99,6 @@ void	Connection::get(void)
 		sendResponse("website/upload.html");
 	else if (_uri == "/nicelife-style.css")
 		sendResponse("website/nicelife-style.css");
-	// else if (_uri == "/cgi")
-	// 	execCgi();
+	else
+		send404();
 }

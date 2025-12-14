@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 20:08:27 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/13 23:52:25 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/14 23:40:53 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void	Connection::start_cgi(void)
 			exit(1);
 		}
 		close(pipefd[1]);
-
 		set_cgi_env();
 		if (execve("/usr/bin/python3", args, environ) == -1)
 		{
@@ -95,7 +94,7 @@ void	Connection::start_cgi(void)
 		_cgi->pipe_fd = pipefd[0];
 		_cgi->output = "";
 		_cgi->completed = false;
-		handle_executing_cgi();
+		_executing = true;
 	}
 }
 
@@ -121,7 +120,7 @@ void	Connection::handle_executing_cgi(void)
 				return ;
 			}
 		}
-		result = waitpid(_cgi->pid, &status, 0);
+		result = waitpid(_cgi->pid, &status, WNOHANG);
 		std ::cout << ";;;;;;;;;;;;;" << result << ";;;;;;" << std::endl;
 		//TODO body vide
 		if (result > 0)
@@ -135,19 +134,15 @@ void	Connection::handle_executing_cgi(void)
 		}
 		if (_cgi->completed == true)
 		{
-
+			_executing = false;
     		parse_cgi_output(_cgi);
-
     		std::map<std::string, std::vector<std::string> > parsed_headers;
-
     		if (_cgi->has_headers)
-    		{
         		parse_cgi_headers(_cgi->cgi_headers, parsed_headers);
-    		}
     		else
-    		{
+			{
         		parsed_headers["Content-Type"].push_back("text/html");
-    		}
+			}
 			_write_buf.clear();
 			_write_buf = build_cgi_response(_cgi, parsed_headers);
 			std::cout << "------------------------" << std::endl;

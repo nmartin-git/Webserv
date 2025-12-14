@@ -171,7 +171,7 @@ html = f"""<! DOCTYPE html>
                 </button>
             </form>
 
-            <a href="/index.html" class="back-link">← Retour à l'accueil</a>
+            <a href="/" class="back-link">← Retour à l'accueil</a>
         </div>
     </div>
 </body>

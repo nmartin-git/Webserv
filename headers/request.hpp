@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 15:04:18 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/13 17:29:55 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/14 23:36:11 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ class	Connection
 	void		handle_executing_cgi(void);
 
 	void		getFilename(t_upload *data, size_t headersLength);
+	bool		getExec();
 	void		upload(void);
 	void		post(void);
 
@@ -79,5 +80,6 @@ class	Connection
 	Env				_env;
 	Response		_response;
 	CGIExecution* 	_cgi;
+	bool			_executing;
 	bool			_close;
 };
