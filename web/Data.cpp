@@ -6,7 +6,7 @@
 /*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/28 16:02:50 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/14 23:50:50 by nmartin          ###   ########.fr       */
+/*   Updated: 2025/12/16 13:54:07 by nmartin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,15 +104,11 @@ void	Data::clientRequest(int index)
 
 	std::cout << "New request from client N." << index << "!" << _fds[index].fd <<std::endl;
 	
-	// Créer la connexion seulement si elle n'existe pas encore//TODO
 	if (_connections.find(_fds[index].fd) == _connections.end())
 	{
-		std::cout << "1[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]" << std ::endl;
 		_connections[_fds[index].fd] = Connection(&_fds[index]);
 		std::cout << "New connection created for fd " << _fds[index].fd << std::endl;
 	}
-	std::cout << "2[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]" << std ::endl;
-	
 	if (_fds[index].revents & POLLIN)
 	{
 		std::cout << "pollin !" << std::endl;

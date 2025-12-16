@@ -33,6 +33,8 @@
             <!-- Liens de navigation -->
             <div class="nav-links">
                 <a href="/login.py" class="btn-nav">Se connecter</a>
+                <!-- Bouton ajouté pour accéder à la page d'upload -->
+                <a href="/upload" class="btn-nav">Uploader</a>
             </div>
         </div>
     </nav>
@@ -50,11 +52,17 @@
                 Un outil pour vous aider à simplifier votre vie
             </p>
 
-            <!-- Bouton principal -->
-            <a href="/login.py" class="btn-primary">
-                Essayer maintenant
-                <span class="btn-arrow">→</span>
-            </a>
+            <!-- Boutons principaux -->
+            <div style="display:inline-flex; gap:12px; align-items:center; justify-content:center;">
+              <a href="/login.py" class="btn-primary">
+                  Essayer maintenant
+                  <span class="btn-arrow">→</span>
+              </a>
+              <!-- Bouton ajouté pour accéder à la page d'upload -->
+              <a href="/upload" class="btn-nav" style="padding:0.9rem 1.4rem; border-radius:50px;">
+                Uploader une image
+              </a>
+            </div>
         </div>
     </section>
 
@@ -124,3 +132,4 @@
 
 </body>
 </html>
+```
