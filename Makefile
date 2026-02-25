@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+         #
+#    By: efranco <efranco@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/05 15:41:03 by nmartin           #+#    #+#              #
-#    Updated: 2025/12/01 15:45:24 by nmartin          ###   ########.fr        #
+#    Updated: 2026/02/20 21:54:20 by efranco          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,11 +23,15 @@ WEB_PATH = ./web/
 WEB_FILES = main.cpp Data.cpp
 WEB := $(addprefix $(WEB_PATH), $(WEB_FILES))
 REQUEST_PATH = ./request/
-REQUEST_FILES = Connection.cpp get.cpp post.cpp
+REQUEST_FILES = Connection.cpp get.cpp post.cpp delete.cpp CGI.cpp
 REQUEST := $(addprefix $(REQUEST_PATH), $(REQUEST_FILES))
+PARSING_PATH = ./parsing/
+PARSING_FILES = ConfigParser.cpp
+PARSING := $(addprefix $(PARSING_PATH), $(PARSING_FILES))
 OBJ_PATH = ./objs/
 OBJ := $(addprefix $(OBJ_PATH), $(WEB_FILES:.cpp=.o)) \
-		$(addprefix $(OBJ_PATH), $(REQUEST_FILES:.cpp=.o))
+		$(addprefix $(OBJ_PATH), $(REQUEST_FILES:.cpp=.o)) \
+			$(addprefix $(OBJ_PATH), $(PARSING_FILES:.cpp=.o))
 SRC_BNS_PATH =
 SRC_BNS_FILES =
 SRC_BNS := $(addprefix $(SRC_BNS_PATH), $(SRC_BNS_FILES))
@@ -56,6 +60,12 @@ $(OBJ_PATH)%.o : $(REQUEST_PATH)%.cpp
 	@$(CC) $(CFLAGS) $(HEADERS) -c $< -o $@
 	@printf "\r\033[K"
 
+$(OBJ_PATH)%.o : $(PARSING_PATH)%.cpp
+	@printf "$(BLUE)Compiling $(NAME) /parsing: [$<] $(RESET)"
+	@mkdir -p $(OBJ_PATH)
+	@$(CC) $(CFLAGS) $(HEADERS) -c $< -o $@
+	@printf "\r\033[K"
+
 $(OBJ_BNS_PATH)%.o : $(SRC_BNS_PATH)%.cpp
 	@printf "$(BLUE)Compiling $(NAME) bonus: [$<] $(RESET)"
 	@mkdir -p $(OBJ_BNS_PATH)
@@ -77,6 +87,6 @@ re : fclean all
 exec : fclean all
 	@make clean --no-print-directory
 
-.PHONY : all clean fclean re	
+.PHONY : all clean fclean re
 
 -include $(DEPS)

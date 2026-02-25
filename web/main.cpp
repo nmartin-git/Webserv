@@ -1,15 +1,23 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nmartin <nmartin@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/28 22:51:07 by nmartin           #+#    #+#             */
-/*   Updated: 2025/12/04 22:27:47 by nmartin          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+// /* ************************************************************************** */
+// /*                                                                            */
+// /*                                                        :::      ::::::::   */
+// /*   main.cpp                                           :+:      :+:    :+:   */
+// /*                                                    +:+ +:+         +:+     */
+// /*   By: efranco <efranco@student.42.fr>            +#+  +:+       +#+        */
+// /*                                                +#+#+#+#+#+   +#+           */
+// /*   Created: 2025/10/30 14:07:19 by efranco           #+#    #+#             */
+// /*   Updated: 2025/12/02 18:22:28 by efranco          ###   ########.fr       */
+// /*                                                                            */
+// /* ************************************************************************** */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <map>
+#include <sys/wait.h>
+#include <fstream>
+#include "Client.hpp"
+#include "Env.hpp"
+#include "request.hpp"
 #include "webserv.hpp"
 
 std::string	getTimestamp(void)
@@ -34,34 +42,51 @@ std::string	getTimestamp(void)
     std::sprintf(buf, "_upload_%02d%02d%02d%02d%03d", year2, month, day, seconds, milli);
     return std::string(buf);
 }
+volatile sig_atomic_t flag_signal = 1;
 
-int client(Data *data)
+void turn_signal(int sig)
 {
-	struct addrinfo	*addrinfo;
-	int				client;
-
-	addrinfo = data->getAddrinfo();
-	client = socket(addrinfo->ai_family, addrinfo->ai_socktype, addrinfo->ai_protocol);
-	if (client == -1)
-		data->exitError();
-	if (connect(client, addrinfo->ai_addr, addrinfo->ai_addrlen) == -1)
-		data->exitError();
-	return (client);
+    (void)sig;
+    flag_signal = 0;
 }
 
 int	main(int ac, char **av)
 {
 	Data	data;
 
+	std::signal(SIGINT, turn_signal);
+    std::signal(SIGTERM, turn_signal);
 	if (ac != 2)
 	{
 		std::cerr << "Error: Bad arguments!\nUsage: ./webserv [configuration file]" << std::endl;
 		exit(2);
 	}
-	(void)av;
-	//parsing conf file//JOUDY au charbon
-	data.setAddrinfo();
-	data.addListener();
+	try {
+		// 1. Tokenization
+		std::vector<std::string> tokens = ConfigTokenizer::tokenize(av[1]);
+
+		// 2. Parsing
+		ConfigParser parser(tokens);
+		parser.parse();
+		std::vector<ConfigServer> servers = parser.getServers();
+
+		// 3. Vérification du résultat
+		std::cout << "Nombre de serveurs configurés : " << servers.size() << std::endl;
+		for (size_t i = 0; i < servers.size(); ++i) {
+			std::cout << "Serveur " << i << " sur le port " << servers[i].getPort() << std::endl;
+			std::cout << "  - Root: " << servers[i].getRoot() << std::endl;
+			std::cout << "  - Nombre de locations: " << servers[i].getLocations().size() << std::endl;
+		}
+        data.setServers(servers);
+	} catch (const std::exception& e) {
+		std::cerr << "Configuration error : " << e.what() << std::endl;
+		return 1;
+	}
+	for (int serverIndex = 0; serverIndex < (int)data.getServers().size(); serverIndex++)
+	{
+		data.setAddrinfo(serverIndex);
+		data.addListener(serverIndex);
+	}
 	data.pollLoop();
 	data.clean();
 }
